@@ -1,70 +1,69 @@
 package Javazord.Zordon;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
-public class Main implements ApplicationListener {
-    private SpriteBatch spriteBatch;
-    private FitViewport viewport;
+public class DropGameScreen implements Screen {
+    final AppEntry appEntry;
 
+    //Lógica e input
     float gotaTempo;
     Vector2 touchPos;
+    int gotasColetadas;
 
     //Física
     Rectangle baldeRet;
     Rectangle gotaRet;
 
     //Assets
-    Texture fundo;
-    Texture balde;
+    Texture fundoTx;
+    Texture baldeTx;
     Sprite baldeSprite;
-    Texture gota;
+    Texture gotaTx;
     Array<Sprite> gotaSprites;
 
     Sound gotaSom;
     Music musica;
 
 
-    @Override
-    public void create() {
-        spriteBatch = new SpriteBatch();
-        viewport = new FitViewport(8, 5);
-
-        baldeRet = new Rectangle();
-        gotaRet = new Rectangle();
+    public DropGameScreen(final AppEntry appEntry){
+        this.appEntry = appEntry;
 
         touchPos = new Vector2();
 
-        fundo = new Texture("DropGame/background.png");
-        balde = new Texture("DropGame/bucket.png");
-        baldeSprite = new Sprite(balde);
+        fundoTx = new Texture("DropGame/background.png");
+        baldeTx = new Texture("DropGame/bucket.png");
+        baldeSprite = new Sprite(baldeTx);
         baldeSprite.setSize(1, 1);
-        gota = new Texture("DropGame/drop.png");
+        gotaTx = new Texture("DropGame/drop.png");
         gotaSprites = new Array<>();
+
+        baldeRet = new Rectangle();
+        gotaRet = new Rectangle();
 
         gotaSom = Gdx.audio.newSound(Gdx.files.internal("DropGame/drop.mp3"));
         musica = Gdx.audio.newMusic(Gdx.files.internal("DropGame/music.mp3"));
         musica.setLooping(true);
         musica.setVolume(.5f);
+    }
+
+    public void show(){
         musica.play();
     }
 
     @Override
-    public void render() {
+    public void render(float delta) {
         input();
         logic();
         draw();
@@ -82,14 +81,14 @@ public class Main implements ApplicationListener {
 
         if (Gdx.input.isTouched()) {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY());
-            viewport.unproject(touchPos);
+            appEntry.viewport.unproject(touchPos);
             baldeSprite.setCenterX(touchPos.x);
         }
     }
 
     private void logic() {
-        float cenaLarg = viewport.getWorldWidth();
-        //float cenaAlt = viewport.getWorldHeight();
+        float cenaLarg = appEntry.viewport.getWorldWidth();
+        //float cenaAlt = appEntry.viewport.getWorldHeight();
         float baldeLarg = baldeSprite.getWidth();
         float baldeAlt = baldeSprite.getHeight();
         float delta = Gdx.graphics.getDeltaTime();
@@ -101,13 +100,13 @@ public class Main implements ApplicationListener {
             Sprite gotaSprite = gotaSprites.get(i);
             float gotaLarg = gotaSprite.getWidth();
             float gotaAlt = gotaSprite.getHeight();
-            //Movimento
+
             gotaSprite.translateY(-2f * delta);
-            //Física
             gotaRet.set(gotaSprite.getX(), gotaSprite.getY(), gotaLarg, gotaAlt);
-            //Limpeza
+
             if (gotaSprite.getY() < - gotaAlt) gotaSprites.removeIndex(i);
             else if (baldeRet.overlaps(gotaRet)){
+                gotasColetadas++;
                 gotaSprites.removeIndex(i);
                 gotaSom.play();
             }
@@ -121,48 +120,62 @@ public class Main implements ApplicationListener {
 
     private void draw(){
         ScreenUtils.clear(Color.BLACK);
-        viewport.apply();
-        spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
-        spriteBatch.begin();
+        appEntry.viewport.apply();
+        appEntry.batch.setProjectionMatrix(appEntry.viewport.getCamera().combined);
+        appEntry.batch.begin();
 
-        float cenaLarg = viewport.getWorldWidth();
-        float cenaAlt = viewport.getWorldHeight();
+        float cenaLarg = appEntry.viewport.getWorldWidth();
+        float cenaAlt = appEntry.viewport.getWorldHeight();
 
-        spriteBatch.draw(fundo, 0, 0, cenaLarg, cenaAlt);
-        baldeSprite.draw(spriteBatch);
+        appEntry.batch.draw(fundoTx, 0, 0, cenaLarg, cenaAlt);
+        baldeSprite.draw(appEntry.batch);
+
+        appEntry.font.draw(appEntry.batch, "Gotas coletadas: " + gotasColetadas, 0, cenaAlt);
 
         for (Sprite gotaSprite : gotaSprites){
-            gotaSprite.draw(spriteBatch);
+            gotaSprite.draw(appEntry.batch);
         }
-        spriteBatch.end();
+        appEntry.batch.end();
     }
 
     private void newGota(){
         float gotaLarg = 1;
         float gotaAlt = 1;
-        float cenaLarg = viewport.getWorldWidth();
-        float cenaAlt = viewport.getWorldHeight();
+        float cenaLarg = appEntry.viewport.getWorldWidth();
+        float cenaAlt = appEntry.viewport.getWorldHeight();
 
-        Sprite gotaSprite = new Sprite(gota);
+        Sprite gotaSprite = new Sprite(gotaTx);
         gotaSprite.setSize(gotaLarg, gotaAlt);
         gotaSprite.setX(MathUtils.random(0f, cenaLarg -gotaLarg));
         gotaSprite.setY(cenaAlt);
         gotaSprites.add(gotaSprite);
     }
 
-    @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
+        appEntry.viewport.update(width, height, true);
+    }
+
+    @Override
+    public void hide(){
+
+    }
+
+    @Override
+    public void pause(){
+
+    }
+
+    @Override
+    public void resume(){
+
     }
 
     @Override
     public void dispose() {
-    }
-
-    public void pause(){
-
-    }
-    public void resume(){
-
+        fundoTx.dispose();
+        baldeTx.dispose();
+        gotaTx.dispose();
+        gotaSom.dispose();
+        musica.dispose();
     }
 }
