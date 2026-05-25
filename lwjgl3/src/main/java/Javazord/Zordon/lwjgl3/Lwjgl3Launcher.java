@@ -1,6 +1,6 @@
 package Javazord.Zordon.lwjgl3;
 
-import Javazord.Zordon.AppEntry;
+import Javazord.Zordon.AppEntrada;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
@@ -12,7 +12,7 @@ public class Lwjgl3Launcher {
     }
 
     private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new AppEntry(), getDefaultConfiguration());
+        return new Lwjgl3Application(new AppEntrada(), getDefaultConfiguration());
     }
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {

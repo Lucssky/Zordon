@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class DropGameScreen implements Screen {
-    final AppEntry appEntry;
+    final AppEntrada app;
 
     //Lógica e input
     float gotaTempo;
@@ -37,8 +37,8 @@ public class DropGameScreen implements Screen {
     Music musica;
 
 
-    public DropGameScreen(final AppEntry appEntry){
-        this.appEntry = appEntry;
+    public DropGameScreen(final AppEntrada appParam){
+        this.app = appParam;
 
         touchPos = new Vector2();
 
@@ -81,13 +81,13 @@ public class DropGameScreen implements Screen {
 
         if (Gdx.input.isTouched()) {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY());
-            appEntry.viewport.unproject(touchPos);
+            app.fViewport.unproject(touchPos);
             baldeSprite.setCenterX(touchPos.x);
         }
     }
 
     private void logic() {
-        float cenaLarg = appEntry.viewport.getWorldWidth();
+        float cenaLarg = app.fViewport.getWorldWidth();
         //float cenaAlt = appEntry.viewport.getWorldHeight();
         float baldeLarg = baldeSprite.getWidth();
         float baldeAlt = baldeSprite.getHeight();
@@ -120,29 +120,29 @@ public class DropGameScreen implements Screen {
 
     private void draw(){
         ScreenUtils.clear(Color.BLACK);
-        appEntry.viewport.apply();
-        appEntry.batch.setProjectionMatrix(appEntry.viewport.getCamera().combined);
-        appEntry.batch.begin();
+        app.fViewport.apply();
+        app.batch.setProjectionMatrix(app.fViewport.getCamera().combined);
+        app.batch.begin();
 
-        float cenaLarg = appEntry.viewport.getWorldWidth();
-        float cenaAlt = appEntry.viewport.getWorldHeight();
+        float cenaLarg = app.fViewport.getWorldWidth();
+        float cenaAlt = app.fViewport.getWorldHeight();
 
-        appEntry.batch.draw(fundoTx, 0, 0, cenaLarg, cenaAlt);
-        baldeSprite.draw(appEntry.batch);
+        app.batch.draw(fundoTx, 0, 0, cenaLarg, cenaAlt);
+        baldeSprite.draw(app.batch);
 
-        appEntry.font.draw(appEntry.batch, "Gotas coletadas: " + gotasColetadas, 0, cenaAlt);
+        app.font.draw(app.batch, "Gotas coletadas: " + gotasColetadas, 0, cenaAlt);
 
         for (Sprite gotaSprite : gotaSprites){
-            gotaSprite.draw(appEntry.batch);
+            gotaSprite.draw(app.batch);
         }
-        appEntry.batch.end();
+        app.batch.end();
     }
 
     private void newGota(){
         float gotaLarg = 1;
         float gotaAlt = 1;
-        float cenaLarg = appEntry.viewport.getWorldWidth();
-        float cenaAlt = appEntry.viewport.getWorldHeight();
+        float cenaLarg = app.fViewport.getWorldWidth();
+        float cenaAlt = app.fViewport.getWorldHeight();
 
         Sprite gotaSprite = new Sprite(gotaTx);
         gotaSprite.setSize(gotaLarg, gotaAlt);
@@ -152,7 +152,7 @@ public class DropGameScreen implements Screen {
     }
 
     public void resize(int width, int height) {
-        appEntry.viewport.update(width, height, true);
+        app.fViewport.update(width, height, true);
     }
 
     @Override

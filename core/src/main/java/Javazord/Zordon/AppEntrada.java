@@ -9,22 +9,29 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class AppEntry extends Game {
-
+//Main
+public class AppEntrada extends Game {
+    public Skin skin;
     public SpriteBatch batch;
     public BitmapFont font;
-    public FitViewport viewport;
+    public FitViewport fViewport;
+    public ScreenViewport sViewport;
 
 
     public void create(){
-        batch = new SpriteBatch();
-        font = new BitmapFont();
-        viewport = new FitViewport(8,5);
+        fViewport = new FitViewport(8,5);
+        sViewport = new ScreenViewport();
 
+        font = new BitmapFont();
         font.setUseIntegerPositions(false);
-        font.getData().setScale( 3 * (viewport.getWorldHeight() / Gdx.graphics.getHeight()));
+        font.getData().setScale( 3 * (fViewport.getWorldHeight() / Gdx.graphics.getHeight()));
+
+        skin = new Skin(Gdx.files.internal("ShadeUI/shadeui/uiskin.json"));
+        batch = new SpriteBatch();
 
         this.setScreen(new MenuPrincipal(this));
     }
@@ -34,6 +41,7 @@ public class AppEntry extends Game {
     }
 
     public void dispose(){
+        skin.dispose();
         batch.dispose();
         font.dispose();
     }
